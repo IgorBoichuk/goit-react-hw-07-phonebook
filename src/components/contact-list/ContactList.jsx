@@ -1,53 +1,46 @@
 import style from '../style.module.css';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
-import { deleteContact } from '../../redux/createSlice';
+import { deleteContact } from 'redux/operations';
+import {
+  selectAllContacts,
+  selectFilter,
+  selectIsLoading,
+} from 'redux/selectors';
 
-import PropTypes from 'prop-types';
-
-export const ContactList = ({ contacts, filter }) => {
+export const ContactList = () => {
   const dispatch = useDispatch();
+
+  const contacts = useSelector(selectAllContacts);
+  const loading = useSelector(selectIsLoading);
+  const filter = useSelector(selectFilter);
+
+  const filtered = contacts.filter(item =>
+    item.name.toLowerCase().includes(filter.toLowerCase())
+  );
 
   const onClickToDelete = event => {
     dispatch(deleteContact(event.target.id));
   };
 
-  const newContactList = contacts.map(({ id, name, number }) => {
-    if (filter.length === 0) {
-      return (
-        <li key={id} className={style.contactitem}>
-          {name}: {number}
-          <button className={style.deletebtn} id={id} onClick={onClickToDelete}>
-            Delete
-          </button>
-        </li>
-      );
-    } else {
-      let searchStatus = name.toLowerCase().indexOf(filter.toLowerCase());
-
-      if (searchStatus === -1) {
-        return null;
-      } else {
-        return (
-          <li key={id} className={style.contactitem}>
-            {name}: {number}
+  return (
+    <ul className={style.contactlist}>
+      {loading ? (
+        <h1>Loadind</h1>
+      ) : (
+        filtered.map(contact => (
+          <li key={contact.id} className={style.contactitem}>
+            {contact.name}: {contact.phone}
             <button
               className={style.deletebtn}
-              id={id}
+              id={contact.id}
               onClick={onClickToDelete}
             >
               Delete
             </button>
           </li>
-        );
-      }
-    }
-  });
-
-  return <ul className={style.contactlist}>{newContactList}</ul>;
-};
-
-ContactList.prototype = {
-  filter: PropTypes.string.isRequired,
-  contacts: PropTypes.array.isRequired,
+        ))
+      )}
+    </ul>
+  );
 };

@@ -1,26 +1,25 @@
 import { useState } from 'react';
-import { nanoid } from 'nanoid';
-import { useDispatch } from 'react-redux';
-
-import { addContact } from '../../redux/createSlice.js';
+import { useDispatch, useSelector } from 'react-redux';
 
 import style from '../style.module.css';
+import { addContact } from 'redux/operations';
+import { selectAllContacts } from 'redux/selectors';
 
-export function ContactForm(props) {
+export function ContactForm() {
   const [name, setName] = useState('');
-  const [number, setNumber] = useState('');
-  const [id, setId] = useState('');
+  const [phone, setNumber] = useState('');
+
+  const dispatch = useDispatch();
 
   const handleInputChange = event => {
     const { name, value } = event.target;
-    setId(nanoid());
 
     switch (name) {
       case 'name':
         setName(value);
         break;
 
-      case 'number':
+      case 'phone':
         setNumber(value);
         break;
 
@@ -28,13 +27,12 @@ export function ContactForm(props) {
         break;
     }
   };
-
-  const dispatch = useDispatch();
+  const contacts = useSelector(selectAllContacts);
 
   const onHandleAddBtn = () => {
     let chackName = false;
 
-    props.contacts.forEach(contact => {
+    contacts.forEach(contact => {
       if (contact.name === name) {
         chackName = true;
       }
@@ -43,7 +41,7 @@ export function ContactForm(props) {
     if (chackName) {
       alert(`${name} is olready in contacts`);
     } else {
-      dispatch(addContact({ id, name, number }));
+      dispatch(addContact({ name, phone }));
       reset();
     }
   };
@@ -74,8 +72,8 @@ export function ContactForm(props) {
         </label>
         <input
           type="tel"
-          name="number"
-          value={number}
+          name="phone"
+          value={phone}
           onChange={handleInputChange}
           className={style.forminput}
           pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"

@@ -6,6 +6,7 @@ import style from '../style.module.css';
 
 export const Filter = () => {
   const dispatch = useDispatch();
+
   const onChangeFilter = event => {
     dispatch(setFilter(event.target.value));
   };
